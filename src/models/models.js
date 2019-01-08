@@ -1,8 +1,14 @@
+import { SchemaType } from 'mongoose'
+
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 // users Schema
 const users = new Schema({
+	_id: {
+		type: Schema.Types.ObjectId,
+		auto: true,
+	},
 	fullName: { type: String, required: true },
 	emailAddress: {
 		type: String,
