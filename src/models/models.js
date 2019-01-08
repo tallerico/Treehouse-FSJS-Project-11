@@ -43,4 +43,52 @@ const courses = new Schema({
 		type: String,
 		required: true,
 	},
+	steps: [
+		{
+			stepNumber: Number,
+			title: {
+				type: String,
+				required: true,
+			},
+			description: {
+				type: String,
+				required: true,
+			},
+		},
+	],
+	reviews: [
+		{
+			type: Schema.Types.ObjectId,
+			ref: 'Review',
+		},
+	],
 })
+
+//model for courses
+const Course = mongoose.model('Course', courses)
+
+//schema for reviews
+const reviews = new Schema({
+	user: {
+		user: {
+			type: Schema.Types.ObjectId,
+			ref: 'User',
+		},
+		postedOn: {
+			type: Date,
+			default: Date.now,
+		},
+		rating: {
+			type: Number,
+			required: true,
+			min: [1, 'Please choose a number between 1 and 5'],
+			max: [5, 'Please choose a number between 1 and 5'],
+		},
+		review: String,
+	},
+})
+
+// model for reviews
+const Review = mongoose.model('Review', users)
+
+export { User, Course, Review }
