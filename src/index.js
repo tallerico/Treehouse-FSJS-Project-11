@@ -7,6 +7,13 @@ const mongoose = require('mongoose')
 
 mongoose.connect('mongodb://localhost/course-api')
 
+// Pending connection to the DB. This will give us success or error message based on connection fail/success.
+const db = mongoose.connection
+db.on('error', console.error.bind(console, 'connection error:'))
+db.once('open', function() {
+	console.log('Connection Successful!')
+})
+
 const app = express()
 
 // set our port
