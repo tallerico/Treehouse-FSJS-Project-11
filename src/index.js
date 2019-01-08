@@ -31,6 +31,12 @@ app.get('/', (req, res) => {
 	})
 })
 
+app.get('/api/users', (req, res, next) => {
+	if (res.statusCode === 200) {
+		//TODO get currently authenticated user
+	}
+})
+
 // uncomment this route in order to test the global error handler
 // app.get('/error', function (req, res) {
 //   throw new Error('Test error');
