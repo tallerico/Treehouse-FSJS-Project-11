@@ -20,3 +20,27 @@ const users = new Schema({
 
 //users Model
 const User = mongoose.model('User', users)
+
+//courses schema
+const courses = new Schema({
+	user: {
+		type: Schema.Types.ObjectId,
+		ref: 'User',
+	},
+	title: {
+		type: String,
+		required: true,
+	},
+	description: {
+		type: String,
+		required: true,
+	},
+	estimatedTime: {
+		type: String,
+		required: true,
+	},
+	materialsNeeded: {
+		type: String,
+		required: true,
+	},
+})
