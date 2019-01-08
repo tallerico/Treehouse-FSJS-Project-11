@@ -4,6 +4,9 @@
 const express = require('express')
 const morgan = require('morgan')
 const mongoose = require('mongoose')
+const Course = require('./models/course')
+const User = require('./models/user')
+const Review = require('./models/review')
 
 mongoose.connect('mongodb://localhost/course-api')
 
@@ -34,6 +37,10 @@ app.get('/', (req, res) => {
 app.get('/api/users', (req, res, next) => {
 	if (res.statusCode === 200) {
 		//TODO get currently authenticated user
+		models.User.find()
+		res.json({
+			message: 'This Works',
+		})
 	}
 })
 
