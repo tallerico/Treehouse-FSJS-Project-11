@@ -4,6 +4,7 @@
 const express = require('express')
 const morgan = require('morgan')
 const mongoose = require('mongoose')
+const bodyParser = require('body-parser')
 const Course = require('./models/course')
 const User = require('./models/user')
 const Review = require('./models/review')
@@ -18,6 +19,8 @@ db.once('open', function() {
 })
 
 const app = express()
+
+app.use(bodyParser())
 
 // set our port
 app.set('port', process.env.PORT || 5000)
@@ -37,10 +40,31 @@ app.get('/', (req, res) => {
 app.get('/api/users', (req, res, next) => {
 	if (res.statusCode === 200) {
 		//TODO get currently authenticated user
-		models.User.find()
-		res.json({
-			message: 'This Works',
+		User.find().then(user => {
+			res.json(user)
 		})
+	}
+})
+
+app.post('/api/users', async (req, res) => {
+	const user = new User({
+		fullName: req.body.fullName,
+		emailAddress: req.body.emailAddress,
+		password: req.body.password,
+		confirmPassword: req.body.confirmPassword,
+	})
+
+	try {
+		await user.save()
+
+		res.set('Location', '/')
+		res.status(201).send({ response: 'User succesfully created' })
+	} catch {
+		if (err.name === 'MongoError' && err.code === 11000) {
+			res.status(409).send({ response: 'error' })
+		}
+
+		res.status(500).send(err)
 	}
 })
 

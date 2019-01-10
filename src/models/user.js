@@ -18,11 +18,8 @@ const users = new Schema({
 				return emailRegx.test(v)
 			},
 		},
-		password: { type: String, required: true },
 	},
+	password: { type: String, required: true },
 })
 
-//users Model
-const User = mongoose.model('User', users)
-
-module.exports = { User }
+module.exports = mongoose.model('User', users)
