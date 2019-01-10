@@ -37,34 +37,64 @@ app.get('/', (req, res) => {
 	})
 })
 
-app.get('/api/users', (req, res, next) => {
-	if (res.statusCode === 200) {
-		//TODO get currently authenticated user
-		User.find().then(user => {
-			res.json(user)
+// app.get('/api/users', (req, res, next) => {
+// 	if (res.statusCode === 200) {
+// 		//TODO get currently authenticated user
+// 		User.find().then(user => {
+// 			res.json(user)
+// 		})
+// 	}
+// })
+
+app.post('/api/users', function(req, res, next) {
+	if (req.body.fullName && req.body.emailAddress && req.body.password && req.body.confirmPassword) {
+		// confirm that user typed same password twice
+		if (req.body.password !== req.body.confirmPassword) {
+			var err = new Error('Passwords do not match.')
+			err.status = 400
+			return next(err)
+		}
+
+		// create object with data
+		const user = new User({
+			fullName: req.body.fullName,
+			emailAddress: req.body.emailAddress,
+			password: req.body.password,
+			confirmPassword: req.body.confirmPassword,
 		})
+
+		// use schema's `create` method to insert document into Mongo
+		User.create(user, function(error, user) {
+			if (error) {
+				return next(error)
+			} else {
+				res.set('Location', '/')
+				res.status(201).send({ response: 'User succesfully created' })
+			}
+		})
+	} else {
+		var err = new Error('All fields required.')
+		err.status = 400
+		return next(err)
 	}
 })
 
-app.post('/api/users', async (req, res) => {
-	const user = new User({
-		fullName: req.body.fullName,
-		emailAddress: req.body.emailAddress,
-		password: req.body.password,
-		confirmPassword: req.body.confirmPassword,
-	})
-
-	try {
-		await user.save()
-
-		res.set('Location', '/')
-		res.status(201).send({ response: 'User succesfully created' })
-	} catch {
-		if (err.name === 'MongoError' && err.code === 11000) {
-			res.status(409).send({ response: 'error' })
-		}
-
-		res.status(500).send(err)
+//get authenticated user
+app.get('/api/users', function(req, res, next) {
+	if (req.body.username && req.body.password) {
+		User.authenticate(req.body.username, req.body.password, function(error, user) {
+			if (error || !user) {
+				var err = new Error('Wrong email or password.')
+				err.status = 401
+				return next(err)
+			} else {
+				User.find({ _id: user._id })
+			}
+		})
+	} else {
+		var err = new Error('Email and password are required.')
+		err.status = 401
+		return next(err)
 	}
 })
 

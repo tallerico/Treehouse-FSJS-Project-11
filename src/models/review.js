@@ -3,6 +3,10 @@ const Schema = mongoose.Schema
 
 //schema for reviews
 const reviews = new Schema({
+	_id: {
+		type: Schema.Types.ObjectId,
+		auto: true,
+	},
 	user: {
 		user: {
 			type: Schema.Types.ObjectId,
@@ -24,4 +28,6 @@ const reviews = new Schema({
 
 // model for reviews
 
-module.exports = mongoose.model('Review', reviews)
+const Review = mongoose.model('Review', reviews)
+
+module.exports = Review

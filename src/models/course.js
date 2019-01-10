@@ -3,6 +3,10 @@ const Schema = mongoose.Schema
 
 //courses schema
 const courses = new Schema({
+	_id: {
+		type: Schema.Types.ObjectId,
+		auto: true,
+	},
 	user: {
 		type: Schema.Types.ObjectId,
 		ref: 'User',
@@ -44,4 +48,6 @@ const courses = new Schema({
 	],
 })
 
-module.exports = mongoose.model('Course', courses)
+const Course = mongoose.model('Course', courses)
+
+module.exports = Course
