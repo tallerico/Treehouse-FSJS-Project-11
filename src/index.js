@@ -5,6 +5,7 @@ const express = require('express')
 const morgan = require('morgan')
 const mongoose = require('mongoose')
 const bodyParser = require('body-parser')
+const auth = require('basic-auth')
 const Course = require('./models/course')
 const User = require('./models/user')
 const Review = require('./models/review')
@@ -81,20 +82,46 @@ app.post('/api/users', function(req, res, next) {
 
 //get authenticated user
 app.get('/api/users', function(req, res, next) {
-	if (req.body.username && req.body.password) {
-		User.authenticate(req.body.username, req.body.password, function(error, user) {
+	const user = auth(req)
+	if (user.name && user.pass) {
+		User.authenticate(user.name, user.pass, function(error, user) {
 			if (error || !user) {
 				var err = new Error('Wrong email or password.')
 				err.status = 401
 				return next(err)
 			} else {
-				User.find({ _id: user._id })
+				res.send(user)
 			}
 		})
 	} else {
 		var err = new Error('Email and password are required.')
 		err.status = 401
 		return next(err)
+	}
+})
+
+//gets all courses
+app.get('/api/courses', (req, res, next) => {
+	if (res.statusCode === 200) {
+		Course.find().then(course => {
+			res.json(course)
+		})
+	} else {
+		return next()
+	}
+})
+
+//gets single course the relates to given id
+app.get('/api/courses/:courseId', (req, res, next) => {
+	if (res.statusCode === 200) {
+		Course.find({ _id: req.params.courseId })
+			.populate('user')
+			.populate('reviews')
+			.then(course => {
+				res.json(course)
+			})
+	} else {
+		return next()
 	}
 })
 
