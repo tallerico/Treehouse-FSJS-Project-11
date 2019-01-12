@@ -103,7 +103,7 @@ app.get('/api/users', function(req, res, next) {
 //gets all courses
 app.get('/api/courses', (req, res, next) => {
 	if (res.statusCode === 200) {
-		Course.find().then(course => {
+		Course.find({}, '_id title').then(course => {
 			res.json(course)
 		})
 	} else {
