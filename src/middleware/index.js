@@ -7,7 +7,6 @@ const User = require('../models/user')
 
 function checkAuth(req, res, next) {
 	const user = auth(req)
-	console.log(user)
 	if (user.name && user.pass) {
 		User.authenticate(user.name, user.pass, function(error, user) {
 			if (error || !user) {
@@ -15,6 +14,7 @@ function checkAuth(req, res, next) {
 				err.status = 401
 				return next(err)
 			} else {
+				res.locals.user = user
 				return next()
 			}
 		})

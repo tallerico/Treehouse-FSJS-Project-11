@@ -82,10 +82,12 @@ app.post('/api/users', function(req, res, next) {
 })
 
 //get authenticated user
-app.get('/api/users', mid.checkAuth, function(req, res, next) {})
+app.get('/api/users', mid.checkAuth, function(req, res, next) {
+	res.send(res.locals.user)
+})
 
 //gets all courses
-app.get('/api/courses', (req, res, next) => {
+app.get('/api/courses', mid.checkAuth, (req, res, next) => {
 	if (res.statusCode === 200) {
 		Course.find({}, '_id title').then(course => {
 			res.json(course)
@@ -111,16 +113,16 @@ app.get('/api/courses/:courseId', (req, res, next) => {
 
 app.post('/api/courses', mid.checkAuth, (req, res, next) => {
 	const course = new Course({
-		user: req.body.userId,
+		user: res.locals.user._id,
 		title: req.body.title,
 		description: req.body.description,
 		estimatedTime: req.body.estimatedTime,
 		materialsNeeded: req.body.materialsNeeded,
 		steps: [
 			{
-				stepNumber: req.body.steps.stepNumber,
-				title: req.body.steps.title,
-				description: req.body.steps.description,
+				stepNumber: req.body.steps[0].stepNumber,
+				title: req.body.steps[0].title,
+				description: req.body.steps[0].description,
 			},
 		],
 	})
