@@ -9,6 +9,7 @@ const auth = require('basic-auth')
 const Course = require('./models/course')
 const User = require('./models/user')
 const Review = require('./models/review')
+const mid = require('./middleware')
 
 mongoose.connect('mongodb://localhost/course-api')
 
@@ -81,24 +82,7 @@ app.post('/api/users', function(req, res, next) {
 })
 
 //get authenticated user
-app.get('/api/users', function(req, res, next) {
-	const user = auth(req)
-	if (user.name && user.pass) {
-		User.authenticate(user.name, user.pass, function(error, user) {
-			if (error || !user) {
-				var err = new Error('Wrong email or password.')
-				err.status = 401
-				return next(err)
-			} else {
-				res.send(user)
-			}
-		})
-	} else {
-		var err = new Error('Email and password are required.')
-		err.status = 401
-		return next(err)
-	}
-})
+app.get('/api/users', mid.checkAuth, function(req, res, next) {})
 
 //gets all courses
 app.get('/api/courses', (req, res, next) => {
@@ -123,6 +107,32 @@ app.get('/api/courses/:courseId', (req, res, next) => {
 	} else {
 		return next()
 	}
+})
+
+app.post('/api/courses', mid.checkAuth, (req, res, next) => {
+	const course = new Course({
+		user: req.body.userId,
+		title: req.body.title,
+		description: req.body.description,
+		estimatedTime: req.body.estimatedTime,
+		materialsNeeded: req.body.materialsNeeded,
+		steps: [
+			{
+				stepNumber: req.body.steps.stepNumber,
+				title: req.body.steps.title,
+				description: req.body.steps.description,
+			},
+		],
+	})
+
+	Course.create(course, function(error, user) {
+		if (error) {
+			return next(error)
+		} else {
+			res.set('Location', '/')
+			res.status(201).send({ response: 'Course succesfully created' })
+		}
+	})
 })
 
 // uncomment this route in order to test the global error handler
