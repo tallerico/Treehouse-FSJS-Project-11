@@ -137,6 +137,36 @@ app.post('/api/courses', mid.checkAuth, (req, res, next) => {
 	})
 })
 
+app.put('/api/courses/:courseId', function(req, res, next) {
+	Course.findOneAndUpdate(
+		{
+			_id: req.params.courseId,
+		},
+		{
+			$set: {
+				// user: res.locals.user._id,
+				title: req.body.title,
+				description: req.body.description,
+				estimatedTime: req.body.estimatedTime,
+				materialsNeeded: req.body.materialsNeeded,
+				steps: [
+					{
+						stepNumber: req.body.steps[0].stepNumber,
+						title: req.body.steps[0].title,
+						description: req.body.steps[0].description,
+					},
+				],
+			},
+		},
+	).then(docs => {
+		if (docs) {
+			res.send('Yay')
+		} else {
+			res.send('Boo')
+		}
+	})
+})
+
 // uncomment this route in order to test the global error handler
 // app.get('/error', function (req, res) {
 //   throw new Error('Test error');
