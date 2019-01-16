@@ -101,7 +101,7 @@ app.get('/api/courses', mid.checkAuth, (req, res, next) => {
 app.get('/api/courses/:courseId', (req, res, next) => {
 	if (res.statusCode === 200) {
 		Course.find({ _id: req.params.courseId })
-			.populate('user')
+			.populate('user', '_id fullName')
 			.populate('reviews')
 			.then(course => {
 				res.json(course)
@@ -137,36 +137,42 @@ app.post('/api/courses', mid.checkAuth, (req, res, next) => {
 	})
 })
 
-app.put('/api/courses/:courseId', function(req, res, next) {
-	Course.findOneAndUpdate(
-		{
-			_id: req.params.courseId,
-		},
-		{
-			$set: {
-				// user: res.locals.user._id,
-				title: req.body.title,
-				description: req.body.description,
-				estimatedTime: req.body.estimatedTime,
-				materialsNeeded: req.body.materialsNeeded,
-				steps: [
-					{
-						stepNumber: req.body.steps[0].stepNumber,
-						title: req.body.steps[0].title,
-						description: req.body.steps[0].description,
-					},
-				],
-			},
-		},
-	).then(docs => {
-		if (docs) {
-			res.send('Yay')
+app.put('/api/courses/:courseId', mid.checkAuth, function(req, res, next) {
+	Course.findByIdAndUpdate(req.params.courseId, { $set: req.body }, function(err, doc) {
+		if (err) {
+			return next(error)
 		} else {
-			res.send('Boo')
+			res.end()
 		}
 	})
 })
 
+app.post('/api/courses/:courseId/reviews', mid.checkAuth, function(req, res, next) {
+	//first checks to see if use is trying to review his own course.
+	Course.find({ _id: req.params.courseId }, function(error, docs) {
+		if (String(res.locals.user._id) != String(docs[0].user)) {
+			//if this is not users course then create a new document for review
+			const review = new Review({
+				user: {
+					rating: req.body.rating,
+				},
+			})
+			Review.create(review, function(error, docs) {
+				if (error) {
+					return next(error)
+				} else {
+					res.set('Location', '/api/courses/' + req.params.courseId)
+					res.end()
+				}
+			})
+		} else {
+			// else send error
+			var err = new Error('Users cannot review their own courses')
+			err.status = 400
+			return next(err)
+		}
+	})
+})
 // uncomment this route in order to test the global error handler
 // app.get('/error', function (req, res) {
 //   throw new Error('Test error');
