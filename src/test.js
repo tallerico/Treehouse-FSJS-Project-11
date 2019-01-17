@@ -10,7 +10,7 @@ const User = require('./models/user')
 
 const test = express()
 
-// enter your own credentials based on what you have in your DB to test.
+// enter your own credentials based on what credentials are in your DB to test.
 function checkAuth(req, res, next) {
 	const user = {
     name: ''
