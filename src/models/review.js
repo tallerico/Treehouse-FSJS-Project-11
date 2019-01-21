@@ -18,7 +18,6 @@ const reviews = new Schema({
 		},
 		rating: {
 			type: Number,
-			required: true,
 			min: [1, 'Please choose a number between 1 and 5'],
 			max: [5, 'Please choose a number between 1 and 5'],
 		},

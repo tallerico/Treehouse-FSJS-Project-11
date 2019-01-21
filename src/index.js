@@ -39,15 +39,6 @@ app.get('/', (req, res) => {
 	})
 })
 
-// app.get('/api/users', (req, res, next) => {
-// 	if (res.statusCode === 200) {
-// 		//TODO get currently authenticated user
-// 		User.find().then(user => {
-// 			res.json(user)
-// 		})
-// 	}
-// })
-
 app.post('/api/users', function(req, res, next) {
 	if (req.body.fullName && req.body.emailAddress && req.body.password && req.body.confirmPassword) {
 		// confirm that user typed same password twice
@@ -71,7 +62,8 @@ app.post('/api/users', function(req, res, next) {
 				return next(error)
 			} else {
 				res.set('Location', '/')
-				res.status(201).send({ response: 'User succesfully created' })
+				res.status(201)
+				res.end()
 			}
 		})
 	} else {
@@ -132,7 +124,8 @@ app.post('/api/courses', mid.checkAuth, (req, res, next) => {
 			return next(error)
 		} else {
 			res.set('Location', '/')
-			res.status(201).send({ response: 'Course succesfully created' })
+			res.status(201)
+			res.end()
 		}
 	})
 })
@@ -142,6 +135,7 @@ app.put('/api/courses/:courseId', mid.checkAuth, function(req, res, next) {
 		if (err) {
 			return next(error)
 		} else {
+			res.status(204)
 			res.end()
 		}
 	})

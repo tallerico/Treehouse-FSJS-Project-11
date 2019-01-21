@@ -21,11 +21,9 @@ const courses = new Schema({
 	},
 	estimatedTime: {
 		type: String,
-		required: true,
 	},
 	materialsNeeded: {
 		type: String,
-		required: true,
 	},
 	steps: [
 		{
